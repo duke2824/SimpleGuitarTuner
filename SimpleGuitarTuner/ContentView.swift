@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    private var audioManager = AudioManager()
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -16,6 +17,9 @@ struct ContentView: View {
             Text("Hello, world!")
         }
         .padding()
+        .onAppear() {
+            audioManager.start()
+        }
     }
 }
 
