@@ -25,7 +25,7 @@ class AudioManager {
         let format = inputNode.inputFormat(forBus: 0)
         
         inputNode.removeTap(onBus: 0) // Remove if already installed
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { buffer, time in
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, time in
             let channelData = buffer.floatChannelData?[0]
             let frameLength = Int(buffer.frameLength)
             let maxSample = channelData.map { (data: UnsafeMutablePointer<Float>) -> Float in
@@ -36,6 +36,9 @@ class AudioManager {
                 return max
             } ?? 0
             print("Received audio buffer. Peak amplitude: \(maxSample)")
+            
+            let frequency = self?.detectFrequency(from: buffer)
+            print("Frequency detected: \(frequency ?? 0)")
         }
         
         do {
@@ -48,5 +51,49 @@ class AudioManager {
     func stop() {
         audioEngine?.stop()
         audioEngine = nil
+    }
+    
+    func detectFrequency(from buffer: AVAudioPCMBuffer) -> Float {
+        let frameCount = Int(buffer.frameLength)
+        guard let channelData = buffer.floatChannelData?[0], frameCount > 0 else { return 0 }
+        let sampleRate = Float(buffer.format.sampleRate)
+        
+        // Copy audio data to a Swift array
+        var samples = [Float](repeating: 0, count: frameCount)
+        for i in 0..<frameCount {
+            samples[i] = channelData[i]
+        }
+        
+        // Optionally normalize
+        let maxAmplitude = samples.max(by: { abs($0) < abs($1) }) ?? 1
+        if abs(maxAmplitude) > 0 {
+            samples = samples.map { $0 / maxAmplitude }
+        }
+        
+        // Autocorrelation
+        var autocorrelation = [Float](repeating: 0, count: frameCount)
+        for lag in 0..<frameCount {
+            var sum: Float = 0
+            for i in 0..<(frameCount - lag) {
+                sum += samples[i] * samples[i + lag]
+            }
+            autocorrelation[lag] = sum
+        }
+        
+        // Find the first minimum (to skip the zero-lag peak)
+        var peakIndex = 0
+        let minLag = Int(sampleRate / 1000) // Ignore periods shorter than 1kHz
+        let maxLag = Int(sampleRate / 50)   // Ignore periods longer than 50Hz
+        var maxValue: Float = 0
+        for lag in minLag..<min(maxLag, frameCount) {
+            if autocorrelation[lag] > maxValue {
+                maxValue = autocorrelation[lag]
+                peakIndex = lag
+            }
+        }
+        
+        if peakIndex == 0 { return 0 }
+        let frequency = sampleRate / Float(peakIndex)
+        return frequency
     }
 }
