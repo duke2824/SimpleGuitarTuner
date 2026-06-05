@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import Foundation
 
 class AudioManager {
     private var audioEngine: AVAudioEngine?
@@ -39,6 +40,14 @@ class AudioManager {
             
             let frequency = self?.detectFrequency(from: buffer)
             print("Frequency detected: \(frequency ?? 0)")
+            
+            if let frequency = frequency,
+               let note = self?.nearestNote(to: frequency) {
+                let differenceHz = frequency - note.frequency
+                let differenceCents = 1200 * log2(frequency / note.frequency)
+                print("Note: \(note.rawValue)")
+                print("Difference: \(differenceHz) Hz, \(differenceCents) cents")
+            }
         }
         
         do {
@@ -95,5 +104,14 @@ class AudioManager {
         if peakIndex == 0 { return 0 }
         let frequency = sampleRate / Float(peakIndex)
         return frequency
+    }
+    
+    /// Returns the nearest GuitarString note to the given frequency
+    func nearestNote(to frequency: Float) -> GuitarString? {
+        return GuitarString.allCases.min(by: { abs($0.frequency - frequency) < abs($1.frequency - frequency) })
+    }
+    
+    func toCents(detectedFrequency: Float, nearestNote: GuitarString) -> Float {
+        return 1200 * log2(detectedFrequency / nearestNote.frequency)
     }
 }
