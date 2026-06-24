@@ -8,14 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    private var audioManager = AudioManager()
+    @State private var audioManager = AudioManager()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
+        TunerMeterView(cents: audioManager.differenceCents ?? 0, note: audioManager.nearestNote?.rawValue ?? "N/A", isInTune: true, errorString: nil)
         .padding()
         .onAppear() {
             audioManager.start()
