@@ -24,23 +24,29 @@ struct TunerMeterView: View {
                 Spacer()
                 ZStack {
                     let r = min(geo.size.width, geo.size.height) * 0.45
-                    let center = CGPoint(x: geo.size.width/2, y: geo.size.height/2)
                     let dynamicSpacing = geo.size.width < geo.size.height ? 128.0 : 32.0
                     
                     ShadowArc(radius: r - 9)
-                        .stroke(Color(.systemGray3).opacity(0.35), lineWidth: 3)
+                        .stroke(Color(.systemGray6), lineWidth: 6)
                         .blur(radius: 1)
                     
                     ForEach([-50, -20, 0, 20, 50], id: \.self) { mark in
                         TunerTick(angle: angle(for: Double(mark)), label: "\(mark)")
                     }
                     
-                    Needle(angle: angle(for: cents), color: needleColor)
-                        .offset(x: center.x - geo.size.width/2, y: center.y - geo.size.height/2)
+                    Needle()
+                        .stroke(isInTune ? Color(.green) : Color(.red), lineWidth: 3)
+                        .offset(x:0, y:20)
+                        .rotationEffect(.degrees(angle(for: cents)))
                         .animation(.spring(response: 0.25, dampingFraction: 0.7), value: cents)
+                    
+                    Dot()
                     
                     VStack(spacing: dynamicSpacing) {
                         Text(note)
+                            .font(.largeTitle)
+                            .fontWeight(.heavy)
+                        
                         Text(errorString ?? "")
                     }
                     .offset(y: geo.size.width < geo.size.height ? r : r*0.5)
@@ -48,6 +54,7 @@ struct TunerMeterView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
+            .sensoryFeedback(.success, trigger: isInTune)
         }
     }
     
@@ -75,17 +82,33 @@ struct ShadowArc: Shape {
 }
 
 // MARK: - Needle View
-struct Needle: View {
-    var angle: Double
-    var color: Color
-    var body: some View {
-        Rectangle()
-            .fill(color)
-            .frame(width: 4, height: 88)
-            .cornerRadius(2)
-            .offset(y: -44)
-            .rotationEffect(.degrees(angle))
-            .shadow(color: color.opacity(0.4), radius: 6, x: 0, y: 2)
+struct Needle: Shape {
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let end = CGPoint(x: rect.midX, y: rect.midY-128)
+        var path = Path()
+        path.addLines([center,end])
+        return path
+    }
+}
+
+// MARK: - Dot view
+struct Dot: Shape {
+    nonisolated func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        let radius: CGFloat = 8
+        let circleRect = CGRect(
+            x: rect.midX - radius,
+            y: rect.midY - radius,
+            width: radius * 2,
+            height: radius * 2
+        )
+        
+        path.addEllipse(in: circleRect)
+        
+        return path
+        
     }
 }
 
@@ -108,10 +131,10 @@ struct TunerTick: View {
                     path.move(to: start)
                     path.addLine(to: end)
                 }
-                .stroke(label == "0" ? Color.primary : Color(.systemGray3), lineWidth: thickness)
+                .stroke(label == "0" ? Color.primary : Color.secondary, lineWidth: thickness)
                 
                 Text(label)
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundColor(label == "0" ? .primary : .secondary)
                     .position(labelPoint)
             }
@@ -125,8 +148,8 @@ struct TunerTick: View {
 
 // MARK: - Preview
 #Preview {
-        TunerMeterView(cents: 20, note: "B2", isInTune: false, errorString: "TUNE UP")
-            .preferredColorScheme(.light)
+    TunerMeterView(cents: 20, note: "B2", isInTune: false, errorString: "TUNE UP")
+        .preferredColorScheme(.light)
 }
 #Preview {
     TunerMeterView(cents: 0, note: "B2", isInTune: true)
