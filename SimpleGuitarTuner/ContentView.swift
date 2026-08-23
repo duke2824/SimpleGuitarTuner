@@ -8,14 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var pitchModel = PitchModel()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
+        TunerMeterView(cents: pitchModel.centOffset,
+                       note: pitchModel.note,
+                       isInTune: pitchModel.isInTune,
+                       errorString: pitchModel.correctNote)
         .padding()
+        .onAppear() {
+            pitchModel.start()
+        }
     }
 }
 

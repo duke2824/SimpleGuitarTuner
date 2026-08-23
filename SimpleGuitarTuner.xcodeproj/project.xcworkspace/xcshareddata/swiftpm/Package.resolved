@@ -1,0 +1,24 @@
+{
+  "originHash" : "e86d7dc974ada93c364aae69d317ff673e7751454b2668589ca70a766e22b77d",
+  "pins" : [
+    {
+      "identity" : "pitchdetector",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/saschasalles/PitchDetector",
+      "state" : {
+        "revision" : "eca12d2bfb8c246ae8cf27bc5ed4e8d2ca692b35",
+        "version" : "0.1.1"
+      }
+    },
+    {
+      "identity" : "pitchy",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/saschasalles/Pitchy",
+      "state" : {
+        "revision" : "f9d615f9f8b2bd6ff7f29f934d0d172d21385348",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}
