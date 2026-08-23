@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var audioManager = AudioManager()
+    @State private var pitchModel = PitchModel()
     
     var body: some View {
-        TunerMeterView(cents: audioManager.differenceCents ?? 0, note: audioManager.nearestNote?.rawValue ?? "N/A", isInTune: true, errorString: nil)
+        TunerMeterView(cents: pitchModel.centOffset,
+                       note: pitchModel.note,
+                       isInTune: pitchModel.isInTune,
+                       errorString: pitchModel.correctNote)
         .padding()
         .onAppear() {
-            audioManager.start()
+            pitchModel.start()
         }
     }
 }
