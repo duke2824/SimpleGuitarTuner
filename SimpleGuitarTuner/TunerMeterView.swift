@@ -148,7 +148,7 @@ struct TunerTick: View {
 
 // MARK: - Preview
 #Preview {
-    TunerMeterView(cents: 20, note: "B2", isInTune: false, errorString: "TUNE UP")
+    TunerMeterView(cents: 20, note: "B2", isInTune: false, errorString: "TUNE DOWN")
         .preferredColorScheme(.light)
 }
 #Preview {

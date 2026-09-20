@@ -19,18 +19,18 @@ import PitchDetector
         centOffset > 5.0 ? "Tune down" : (centOffset < -5.0 ? "Tune up" : "In tune")
     }
     
-    func pitchEngine(_ pitchEngine: PitchDetector.PitchEngine, didReceivePitch pitch: Pitchy.Pitch) {
+    func pitchEngine(_ pitchEngine: PitchEngine, didReceivePitch pitch: Pitch) {
         note = pitch.note.string
         centOffset = pitch.closestOffset.cents
         print("Note detected: \(note)")
         print("Cent offset: \(centOffset)")
     }
     
-    func pitchEngine(_ pitchEngine: PitchDetector.PitchEngine, didReceiveError error: any Error) {
+    func pitchEngine(_ pitchEngine: PitchEngine, didReceiveError error: any Error) {
         print("Error: \(error)")
     }
     
-    func pitchEngineWentBelowLevelThreshold(_ pitchEngine: PitchDetector.PitchEngine) {
+    func pitchEngineWentBelowLevelThreshold(_ pitchEngine: PitchEngine) {
         print("Below level threshold")
     }
     
@@ -41,9 +41,11 @@ import PitchDetector
         pitchEngine.levelThreshold = -30.0
     }
     
+    // Start pitch engine asynchronously with Task to support concurrency without marking this method async
     func start() {
         config()
-        
-        pitchEngine.start()
+        Task {
+            await pitchEngine.start()
+        }
     }
 }
