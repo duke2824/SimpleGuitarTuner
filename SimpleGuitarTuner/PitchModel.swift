@@ -31,7 +31,7 @@ import PitchDetector
     }
     
     func pitchEngineWentBelowLevelThreshold(_ pitchEngine: PitchEngine) {
-        print("Below level threshold")
+//        print("Below level threshold")
     }
     
     var pitchEngine: PitchEngine = PitchEngine()

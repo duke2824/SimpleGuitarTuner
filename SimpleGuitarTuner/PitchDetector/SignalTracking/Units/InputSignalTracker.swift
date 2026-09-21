@@ -40,7 +40,8 @@ final class InputSignalTracker: SignalTracker {
 
     func start() throws {
         try session.setCategory(AVAudioSession.Category.playAndRecord)
-
+        try session.setAllowHapticsAndSystemSoundsDuringRecording(true)
+        
         // check input type
         let currentRoute = session.currentRoute
         if currentRoute.outputs.count != 0 {

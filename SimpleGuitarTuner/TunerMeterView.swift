@@ -54,7 +54,6 @@ struct TunerMeterView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
-            .sensoryFeedback(.success, trigger: isInTune)
         }
     }
     
@@ -147,12 +146,12 @@ struct TunerTick: View {
 }
 
 // MARK: - Preview
-#Preview {
-    TunerMeterView(cents: 20, note: "B2", isInTune: false, errorString: "TUNE DOWN")
-        .preferredColorScheme(.light)
-}
-#Preview {
-    TunerMeterView(cents: 0, note: "B2", isInTune: true)
-        .preferredColorScheme(.light)
-}
+//#Preview {
+//    TunerMeterView(cents: 20, note: "B2", isInTune: false, errorString: "TUNE DOWN")
+//        .preferredColorScheme(.light)
+//}
+//#Preview {
+//    TunerMeterView(cents: 0, note: "B2", isInTune: true)
+//        .preferredColorScheme(.light)
+//}
 
